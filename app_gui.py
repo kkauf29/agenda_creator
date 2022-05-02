@@ -8,7 +8,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
-
+from datetime import date, time, datetime
 
 
 class Agenda_Form(tk.Tk):
@@ -35,7 +35,7 @@ class Agenda_Form(tk.Tk):
         # label and entry pairs are created for all of the form fields with tk.Label and tk.Entry
         # grid is used to position the elements
         #Date 
-        self.label1 = tk.Label(self.content, text="Date:", bg="black", fg="white")
+        self.label1 = tk.Label(self.content, text="Date (YYYY-MM-DD):", bg="black", fg="white")
         self.label1.grid(column=0, row=1, sticky="w")    
         self.dateEntry = tk.StringVar()
         self.entry1 = tk.Entry(self.content, width=10, textvariable=self.dateEntry)
@@ -43,7 +43,12 @@ class Agenda_Form(tk.Tk):
         self.entry1.grid(column=1, row=1, sticky="w")
     
         #meeting start time label and entry field
-        self.label2 = tk.Label(self.content, text="Meeting Start Time:", bg="black", fg="white")
+        self.label2 = tk.Label(
+            self.content, 
+            text="Meeting Start Time (24 hour HH:MM):", 
+            bg="black", 
+            fg="white"
+            )
         self.label2.grid(column=0, row=7, sticky="w")    
         self.startTime = tk.StringVar()
         self.entry2 = tk.Entry(self.content, width=10, textvariable=self.startTime)
@@ -147,10 +152,20 @@ class Agenda_Form(tk.Tk):
             )
         self.rad4.grid(column=0, row=13, sticky="w")
     
-        btn = tk.Button(self.content, text="Submit", command=self.get_entries, highlightbackground="black")
+        btn = tk.Button(
+            self.content, 
+            text="Submit", 
+            command=self.get_entries, 
+            highlightbackground="black"
+            )
         btn.grid(column=0, row=14, sticky="w")   
     
-        btn2 = tk.Button(self.content, text="Get Agenda", command=self.display_agenda, highlightbackground="black")
+        btn2 = tk.Button(
+            self.content, 
+            text="Get Agenda", 
+            command=self.date_prompt, 
+            highlightbackground="black"
+            )
         btn2.grid(column=0, row=15, sticky="w")
 
     
@@ -182,12 +197,15 @@ class Agenda_Form(tk.Tk):
         else:
             departmentType = 'Unkown'        
         
+        agendaDateTime = dateE + " " + startT
+        agendaDateTime = datetime.strptime(agendaDateTime, "%Y-%m-%d %H:%M")
+        #startTme = datetime.strptime(startT, "%H:%M")
 
         #inserts form values into database
         mydb = sqlite3.connect('Agenda_Creator.db')
         myCursor = mydb.cursor()
-        myCursor.execute("Insert INTO agenda (meeting_date, presenter_fname, presenter_lname, agenda_item, bullet_point1, bullet_point2, meeting_start_time, item_length, department) VALUES (?,?,?,?,?,?,?,?,?)",
-                    [dateE,presenterF,presenterL,agendaI,bulletP1,bulletP2,startT,itemL,departmentType] )
+        myCursor.execute("Insert INTO agenda (meeting_date_time, presenter_fname, presenter_lname, agenda_item, bullet_point1, bullet_point2, item_length, department) VALUES (?,?,?,?,?,?,?,?)",
+                    [agendaDateTime,presenterF,presenterL,agendaI,bulletP1,bulletP2,itemL,departmentType] )
         mydb.commit()
     
         mydb.close()
@@ -204,21 +222,73 @@ class Agenda_Form(tk.Tk):
         self.entry8.delete(0, tk.END)
         self.departmentSelected.set(0)
         
-    def display_agenda(self):
-        pass
-#       This function will eventually display information from the database
-#        display_window = tk.Tk() # creates root window object
+    def date_prompt(self):
+        # This function will eventually display information from the database
+       
+        self.display_window = tk.Tk() # creates root window object
 
-#        display_window.title("Agenda Creator")
-#        display_window.geometry("500x500") 
+        self.display_window.title("Agenda Creator")
+        self.display_window.geometry("500x500")
+        self.display_window.configure(bg="black")
     
-#        content = tk.Frame(window) #creates frame for content within root window
-#        content.grid(padx=5, pady=5) 
+        self.frame1 = tk.Frame(self.display_window) #creates frame for content within root window
+        self.frame1.grid(padx=5, pady=5)
+        self.frame1.configure(bg="black")
         
-#        mydb = sqlite3.connect('Agenda_Creator.db')
-#        myCursor = mydb.cursor()   
+        self.prompt = tk.Label(
+            self.frame1, 
+            text="Please select the date and time for your meeting:",
+            bg="black",
+            fg="white"
+            )            
+        self.prompt.grid(column=0, row=0, pady=15, sticky="w", columnspan=2)
+        
+        mydb = sqlite3.connect('Agenda_Creator.db')
+        myCursor = mydb.cursor()
+        query = '''SELECT DISTINCT meeting_date_time FROM agenda'''
+        myCursor.execute(query)
+        dateTimes = myCursor.fetchall()
+        print(dateTimes)
+        self.clicked = tk.StringVar(self.frame1)
+        self.clicked.set("select")
+        self.dropDown = tk.OptionMenu(self.frame1, self.clicked, *dateTimes)
+        self.dropDown.config(fg="white", bg="black")
+        self.dropDown.grid(column=0, row=1)
+        
+        
+        displayButton = tk.Button(
+             self.frame1, 
+             text="Display Agenda", 
+             command=self.display_agenda, 
+             highlightbackground="black")
+        displayButton.grid(column=3, row=1, sticky="w") 
+                    
+        mydb.close()
+        
+         
+    def display_agenda(self):
+    
+        selectedMeeting = self.clicked.get()
+        print(selectedMeeting)
+        
+        selectedMeet = ""
+        for item in selectedMeeting:
+            selectedMeet = selectedMeet + item
+            selectedMeet = selectedMeet.strip("(),''")
+        print(selectedMeet)
+        
+        selectedMeetDT = datetime.strptime(selectedMeet, "%Y-%m-%d %H:%M:%S")
+        
+        conn = sqlite3.connect('Agenda_Creator.db')
+        cursor2 = conn.cursor()
+        query2 = '''SELECT * FROM agenda 
+                    WHERE meeting_date_time = ?'''
+        cursor2.execute(query2, [selectedMeetDT])
+       
+        agendaItems = cursor2.fetchall()
+        print(agendaItems) 
           
-        
+        conn.close()
         
 
     

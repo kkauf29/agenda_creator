@@ -17,13 +17,12 @@ def main():
 
     query = "CREATE TABLE agenda (" \
     + "agenda_id INTEGER," \
-    + "meeting_date TEXT," \
+    + "meeting_date_time DATE," \
     + "presenter_fname TEXT," \
     + "presenter_lname TEXT," \
     + "agenda_item TEXT," \
     + "bullet_point1 TEXT," \
     + "bullet_point2 TEXT," \
-    + "meeting_start_time TEXT," \
     + "item_length TEXT," \
     + "department TEXT," \
     + "PRIMARY KEY('agenda_id' AUTOINCREMENT) " \
