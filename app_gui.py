@@ -1,8 +1,9 @@
 ###
 # Kim Kaufman
 # CSC 217
-# 4-11-22
-# This file will create the GUI for the agenda creator app
+# 4-25-22
+# This file will create the GUI for the agenda creator app and use this 
+# form to submit values to the Agenda_Creator database
 
 import tkinter as tk
 from tkinter import messagebox
@@ -10,112 +11,164 @@ import sqlite3
 
 
 
+class Agenda_Form(tk.Tk):
+    def __init__(self):
+        super().__init__()
+    
+        self.title("Agenda Creator")
+        self.geometry("500x500")
+        self.configure(bg="black") 
+    
+        #creates frame for content within root window
+        self.content = tk.Frame() 
+        self.content.grid(padx=5, pady=5)
+        self.content.configure(bg="black")
 
-def display_agenda(): 
-    #this function will display the info from the form enteries and the database
-    pass
+        self.prompt = tk.Label(
+            self.content, 
+            text="Fill out this form to add your items to the agenda",
+            bg="black",
+            fg="white"
+            )            
+        self.prompt.grid(column=0, row=0, pady=15, sticky="w", columnspan=2)
 
-#def clicked(): # displays message when the submit button is clicked
-#   messagebox.showinfo('Message title', 'Thank you for submitting your agenda items')
+        # label and entry pairs are created for all of the form fields with tk.Label and tk.Entry
+        # grid is used to position the elements
+        #Date 
+        self.label1 = tk.Label(self.content, text="Date:", bg="black", fg="white")
+        self.label1.grid(column=0, row=1, sticky="w")    
+        self.dateEntry = tk.StringVar()
+        self.entry1 = tk.Entry(self.content, width=10, textvariable=self.dateEntry)
+        self.entry1.config(highlightbackground="black")
+        self.entry1.grid(column=1, row=1, sticky="w")
+    
+        #meeting start time label and entry field
+        self.label2 = tk.Label(self.content, text="Meeting Start Time:", bg="black", fg="white")
+        self.label2.grid(column=0, row=7, sticky="w")    
+        self.startTime = tk.StringVar()
+        self.entry2 = tk.Entry(self.content, width=10, textvariable=self.startTime)
+        self.entry2.config(highlightbackground="black")
+        self.entry2.grid(column=1, row=7, sticky="w")    
+    
+        #item length 
+        self.label3 = tk.Label(
+            self.content, 
+            text="Item Length (use minutes):",
+            bg="black",
+            fg="white"
+            )
+        self.label3.grid(column=0, row=8, sticky="w")
+        self.itemLength = tk.StringVar()
+        self.entry3 = tk.Entry(self.content, width=10, textvariable=self.itemLength)
+        self.entry3.config(highlightbackground="black")
+        self.entry3.grid(column=1, row=8, sticky="w")  
+    
+        #presenter first name
+        self.label4 = tk.Label(self.content,text="Presenter First Name:", bg="black", fg="white")
+        self.label4.grid(column=0, row=2, sticky="w")
+        self.presenterFName = tk.StringVar()
+        self.entry4 = tk.Entry(self.content, width=25, textvariable=self.presenterFName)
+        self.entry4.config(highlightbackground="black")
+        self.entry4.grid(column=1, row=2, sticky="w")
+    
+        #presenter first name
+        self.label5 = tk.Label(self.content, text="Presenter Last Name:", bg="black", fg="white")
+        self.label5.grid(column=0, row=3, sticky="w")
+        self.presenterLName = tk.StringVar()
+        self.entry5 = tk.Entry(self.content, width=25, textvariable=self.presenterLName)
+        self.entry5.config(highlightbackground="black")
+        self.entry5.grid(column=1, row=3, sticky="w")
+    
+        #agenda item label and entry field
+        self.label6 = tk.Label(self.content, text="Agenda Item:", bg="black", fg="white")
+        self.label6.grid(column=0, row=4, sticky="w")
+        self.agendaItem = tk.StringVar()
+        self.entry6 = tk.Entry(self.content, width=25, textvariable=self.agendaItem)
+        self.entry6.config(highlightbackground="black")
+        self.entry6.grid(column=1, row=4, sticky="w")    
+    
+        #bullet point 1 label and entry field
+        self.label7 = tk.Label(self.content, text="Bullet Point 1:", bg="black", fg="white")
+        self.label7.grid(column=0, row=5, sticky="w")
+        self.bulletPoint1 = tk.StringVar()
+        self.entry7 = tk.Entry(self.content, width=25, textvariable=self.bulletPoint1)
+        self.entry7.config(highlightbackground="black")
+        self.entry7.grid(column=1, row=5, sticky="w")    
+    
+        # bullet point 2 label and entry field
+        self.label8 = tk.Label(self.content, text="Bullet Point 2:", bg="black", fg="white")
+        self.label8.grid(column=0, row=6, sticky="w")
+        self.bulletPoint2 = tk.StringVar()
+        self.entry8 = tk.Entry(self.content, width=25, textvariable=self.bulletPoint2)
+        self.entry8.config(highlightbackground="black")
+        self.entry8.grid(column=1, row=6, sticky="w")      
+    
+        #Department label and radio buttons
+        self.label9 = tk.Label(self.content, text="Department:", bg="black", fg="white")
+        self.label9.grid(column=0, row=9, sticky="w")
+        self.departmentSelected = tk.IntVar()
+        self.rad1 = tk.Radiobutton(
+            self.content, 
+            text="Sales", 
+            value=1, 
+            variable=self.departmentSelected,
+            bg="black",
+            fg="white"
+            )
+        self.rad1.grid(column=0, row=10, sticky="w") 
+    
+        self.rad2 = tk.Radiobutton(
+            self.content, 
+            text="Accounting", 
+            value=2, 
+            variable=self.departmentSelected,
+            bg="black",
+            fg="white"
+            )
+        self.rad2.grid(column=0, row=11, sticky="w")
+    
+        self.rad3 = tk.Radiobutton(
+            self.content, 
+            text="IT", 
+            value=3, 
+            variable=self.departmentSelected,
+            bg="black",
+            fg="white"
+            )
+        self.rad3.grid(column=0, row=12, sticky="w")
+    
+        self.rad4 = tk.Radiobutton(
+            self.content, 
+            text="HR", 
+            value=4, 
+            variable=self.departmentSelected,
+            bg="black",
+            fg="white"
+            )
+        self.rad4.grid(column=0, row=13, sticky="w")
+    
+        btn = tk.Button(self.content, text="Submit", command=self.get_entries, highlightbackground="black")
+        btn.grid(column=0, row=14, sticky="w")   
+    
+        btn2 = tk.Button(self.content, text="Get Agenda", command=self.display_agenda, highlightbackground="black")
+        btn2.grid(column=0, row=15, sticky="w")
 
-def main():
     
-    window = tk.Tk() # creates root window object
-
-    window.title("Agenda Creator")
-    window.geometry("500x500") 
+        self.labelAction = tk.Label(text="No Action taken yet.", bg="black", fg="white")
+        self.labelAction.grid(column=0,row=19)
     
-    content = tk.Frame(window) #creates frame for content within root window
-    content.grid(padx=5, pady=5)
-
-    prompt = tk.Label(content, text="Fill out this form to add your items to the agenda")
-    prompt.grid(column=0, row=0, pady=15, sticky="w", columnspan=2)
-
-    # label and entry pairs are created for all of the form fields with tk.Label and tk.Entry
-    # grid is used to position the elements 
-    label1 = tk.Label(content, text="Date:")
-    label1.grid(column=0, row=1, sticky="w")
-    
-    dateEntry = tk.StringVar()
-    entry1 = tk.Entry(content, width=10, textvariable=dateEntry)
-    entry1.grid(column=1, row=1, sticky="w")
-    
-    label2 = tk.Label(content, text="Meeting Start Time:")
-    label2.grid(column=0, row=7, sticky="w")
-    
-    startTime = tk.StringVar()
-    entry2 = tk.Entry(content, width=10, textvariable=startTime)
-    entry2.grid(column=1, row=7, sticky="w")    
-    
-    label3 = tk.Label(content, text="Item Length:")
-    label3.grid(column=0, row=8, sticky="w")
-    
-    itemLength = tk.StringVar()
-    entry3 = tk.Entry(content, width=10, textvariable=itemLength)
-    entry3.grid(column=1, row=8, sticky="w")  
-    
-    label4 = tk.Label(content,text="Presenter First Name:")
-    label4.grid(column=0, row=2, sticky="w")
-    
-    presenterFName = tk.StringVar()
-    entry4 = tk.Entry(content, width=25, textvariable=presenterFName)
-    entry4.grid(column=1, row=2, sticky="w")
-    
-    label5 = tk.Label(content, text="Presenter Last Name:")
-    label5.grid(column=0, row=3, sticky="w")
-    
-    presenterLName = tk.StringVar()
-    entry5 = tk.Entry(content, width=25, textvariable=presenterLName)
-    entry5.grid(column=1, row=3, sticky="w")
-    
-    label6 = tk.Label(content, text="Agenda Item:")
-    label6.grid(column=0, row=4, sticky="w")
-    
-    agendaItem = tk.StringVar()
-    entry6 = tk.Entry(content, width=25, textvariable=agendaItem)
-    entry6.grid(column=1, row=4, sticky="w")    
-    
-    label7 = tk.Label(content, text="Bullet Point 1:")
-    label7.grid(column=0, row=5, sticky="w")
-    
-    bulletPoint1 = tk.StringVar()
-    entry7 = tk.Entry(content, width=25, textvariable=bulletPoint1)
-    entry7.grid(column=1, row=5, sticky="w")    
-    
-    label8 = tk.Label(content, text="Bullet Point 2:")
-    label8.grid(column=0, row=6, sticky="w")
-    
-    bulletPoint2 = tk.StringVar()
-    entry8 = tk.Entry(content, width=25, textvariable=bulletPoint2)
-    entry8.grid(column=1, row=6, sticky="w")      
-    
-    label9 = tk.Label(content, text="Department:")
-    label9.grid(column=0, row=9, sticky="w")
-    
-    departmentSelected = tk.IntVar()
-    rad1 = tk.Radiobutton(content, text="Sales", value=1, variable=departmentSelected)
-    rad1.grid(column=0, row=10, sticky="w") 
-    
-    rad2 = tk.Radiobutton(content, text="Accounting", value=2, variable=departmentSelected)
-    rad2.grid(column=0, row=11, sticky="w")
-    
-    rad3 = tk.Radiobutton(content, text="IT", value=3, variable=departmentSelected)
-    rad3.grid(column=0, row=12, sticky="w")
-    
-    rad4 = tk.Radiobutton(content, text="HR", value=4, variable=departmentSelected)
-    rad4.grid(column=0, row=13, sticky="w")
-    
-    def get_entries():
-    # this function will get information for the form entries
-        dateE = dateEntry.get()
-        startT = startTime.get()
-        itemL = itemLength.get()
-        presenterF = presenterFName.get()
-        presenterL = presenterLName.get() 
-        agendaI = agendaItem.get()
-        bulletP1 = bulletPoint1.get()
-        bulletP2 = bulletPoint2.get()
-        departmentS = departmentSelected.get()
+    def get_entries(self):
+        # this function will get information from the form entries 
+        # and insert this info into the SQLite database
+        dateE = self.dateEntry.get()
+        startT = self.startTime.get()
+        itemL = self.itemLength.get()
+        presenterF = self.presenterFName.get()
+        presenterL = self.presenterLName.get() 
+        agendaI = self.agendaItem.get()
+        bulletP1 = self.bulletPoint1.get()
+        bulletP2 = self.bulletPoint2.get()
+        departmentS = self.departmentSelected.get()
         
         departmentType = 'Unknown'
         if departmentS == 1:
@@ -130,7 +183,7 @@ def main():
             departmentType = 'Unkown'        
         
 
-    
+        #inserts form values into database
         mydb = sqlite3.connect('Agenda_Creator.db')
         myCursor = mydb.cursor()
         myCursor.execute("Insert INTO agenda (meeting_date, presenter_fname, presenter_lname, agenda_item, bullet_point1, bullet_point2, meeting_start_time, item_length, department) VALUES (?,?,?,?,?,?,?,?,?)",
@@ -138,45 +191,41 @@ def main():
         mydb.commit()
     
         mydb.close()
-        labelAction['text'] = 'Database Updated.'
+        self.labelAction['text'] = 'Database Updated.'
         messagebox.showinfo('Message title', 'Thank you for submitting your agenda items')
     
-        entry1.delete(0, tk.END)    
-        entry2.delete(0, tk.END)
-        entry3.delete(0, tk.END)
-        entry4.delete(0, tk.END)
-        entry5.delete(0, tk.END)
-        entry6.delete(0, tk.END)
-        entry7.delete(0, tk.END)
-        entry8.delete(0, tk.END)
-        departmentSelected.set(0)
+        self.entry1.delete(0, tk.END)    
+        self.entry2.delete(0, tk.END)
+        self.entry3.delete(0, tk.END)
+        self.entry4.delete(0, tk.END)
+        self.entry5.delete(0, tk.END)
+        self.entry6.delete(0, tk.END)
+        self.entry7.delete(0, tk.END)
+        self.entry8.delete(0, tk.END)
+        self.departmentSelected.set(0)
         
-    def display_agenda():
-        display_window = tk.Tk() # creates root window object
+    def display_agenda(self):
+        pass
+#       This function will eventually display information from the database
+#        display_window = tk.Tk() # creates root window object
 
-        display_window.title("Agenda Creator")
-        display_window.geometry("500x500") 
+#        display_window.title("Agenda Creator")
+#        display_window.geometry("500x500") 
     
-        content = tk.Frame(window) #creates frame for content within root window
-        content.grid(padx=5, pady=5) 
+#        content = tk.Frame(window) #creates frame for content within root window
+#        content.grid(padx=5, pady=5) 
         
-        mydb = sqlite3.connect('Agenda_Creator.db')
-        myCursor = mydb.cursor()   
-        myCursor.execute('SELECT ')
+#        mydb = sqlite3.connect('Agenda_Creator.db')
+#        myCursor = mydb.cursor()   
+          
         
         
-    btn = tk.Button(content, text="Submit", command=get_entries)
-    btn.grid(column=0, row=14, sticky="w")   
-    
-    btn2 = tk.Button(content, text="Get Agenda", command=display_agenda)
-    btn2.grid(column=0, row=15, sticky="w")
 
-   # get_entries(dateEntry, startTime, itemLength, presenterFName, presenterLName, agendaItem, bulletPoint1, bulletPoint2, departmentSelected)
     
-    labelAction = tk.Label(text="No Action taken yet.")
-    labelAction.grid(column=0,row=19)
     
-    window.mainloop()
+def main():
+    agenda = Agenda_Form()
+    Agenda_Form.mainloop(agenda)
 
 
 if __name__ == "__main__":
