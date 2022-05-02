@@ -248,7 +248,7 @@ class Agenda_Form(tk.Tk):
         query = '''SELECT DISTINCT meeting_date_time FROM agenda'''
         myCursor.execute(query)
         dateTimes = myCursor.fetchall()
-        print(dateTimes)
+    
         self.clicked = tk.StringVar(self.frame1)
         self.clicked.set("select")
         self.dropDown = tk.OptionMenu(self.frame1, self.clicked, *dateTimes)
@@ -267,7 +267,9 @@ class Agenda_Form(tk.Tk):
         
          
     def display_agenda(self):
-    
+        
+        #self.frame2 = tk.Frame(self.display_window) 
+
         selectedMeeting = self.clicked.get()
         print(selectedMeeting)
         
@@ -285,9 +287,43 @@ class Agenda_Form(tk.Tk):
                     WHERE meeting_date_time = ?'''
         cursor2.execute(query2, [selectedMeetDT])
        
-        agendaItems = cursor2.fetchall()
-        print(agendaItems) 
-          
+        agendaItems = cursor2.fetchall() 
+        
+
+        self.labelMeeting = tk.Label(
+            self.frame1, 
+            text=f"Agenda for Meeting {selectedMeetDT}", 
+            bg="black", 
+            fg="white"
+            )
+        self.labelMeeting.grid(column=0, row=10, columnspan=2)
+        
+        row_index=11
+        for i, row in enumerate(agendaItems):
+            self.labelAgendaItem = tk.Label(
+                self.frame1,
+                text=f"{row[4]} - {row[2]} {row[3]} - {row[8]} - {row[7]} mins",
+                bg="black",
+                fg="white"
+            )
+            self.labelAgendaItem.grid(column=0, row=row_index + i, sticky="W")
+            
+            self.labelBP1 = tk.Label(
+                self.frame1,
+                text=f"--- {row[5]}",
+                bg="black",
+                fg="white"
+            )
+            self.labelBP1.grid(column=0, row=row_index + i + 1, sticky="W")
+            
+            self.labelBP2 = tk.Label(
+                self.frame1,
+                text=f"--- {row[6]}",
+                bg="black",
+                fg="white"
+            )
+            self.labelBP2.grid(column=0, row=row_index + i + 2, sticky="W")
+            row_index += 3
         conn.close()
         
 
