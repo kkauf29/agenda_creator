@@ -185,6 +185,7 @@ class Agenda_Form(tk.Tk):
         bulletP2 = self.bulletPoint2.get()
         departmentS = self.departmentSelected.get()
         
+        # gets the departments from the radio button values
         departmentType = 'Unknown'
         if departmentS == 1:
             departmentType = 'Sales'
@@ -197,9 +198,10 @@ class Agenda_Form(tk.Tk):
         else:
             departmentType = 'Unkown'        
         
+        #concatenates meeting start date and time to be in one column that takes datetime values 
         agendaDateTime = dateE + " " + startT
         agendaDateTime = datetime.strptime(agendaDateTime, "%Y-%m-%d %H:%M")
-        #startTme = datetime.strptime(startT, "%H:%M")
+        
 
         #inserts form values into database
         mydb = sqlite3.connect('Agenda_Creator.db')
@@ -298,7 +300,18 @@ class Agenda_Form(tk.Tk):
             )
         self.labelMeeting.grid(column=0, row=10, columnspan=2)
         
-        row_index=11
+        today = datetime.now()
+        time_span = (selectedMeetDT - today).days
+        self.labelTime = tk.Label(
+            self.frame1, 
+            text=f"This meeting will take place in {time_span} days", 
+            bg="black", 
+            fg="white"
+            )
+        self.labelTime.grid(column=0, row=11, columnspan=2, sticky="W")
+        
+        
+        row_index=12
         for i, row in enumerate(agendaItems):
             self.labelAgendaItem = tk.Label(
                 self.frame1,
